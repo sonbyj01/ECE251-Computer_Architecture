@@ -1,0 +1,100 @@
+Name     Assignment2 ;
+PartNo   ATF22V10C ;
+Date     05/18/2020 ;
+Revision 01 ;
+Designer sonbyj01 ;
+Company  Cooper Union ;
+Assembly None ;
+Location ;
+Device   g22v10 ;
+
+/* *************** INPUT PINS ******************** */
+PIN 1 = clk;        /* clock */
+PIN 2 = a;
+PIN 3 = b;
+PIN 4 = dir;        /* direction */
+PIN 5 = preset;
+PIN 6 = reset;
+PIN 7 = oe;         /* output enable */
+PIN 8 = clr;        /* clear */
+PIN 9 = en;         /* enable */
+
+/* *************** OUTPUT PINS ******************** */
+PIN 14 = Y0;
+PIN 15 = Y1;
+PIN 16 = Y2;
+PIN 17 = Y3;
+PIN 18 = Y4;
+PIN 19 = Y5;
+
+/* *************** LOGIC EQUATIONS ******************** */
+Y0 = !a;        /* 'NOT' operation */
+Y1 = a & b;     /* 'AND' operation */
+Y2 = a $ b;     /* 'XOR' operation */
+
+/* *************** 3 BIT COUNTER ******************** */
+/* define binary states */
+FIELD count = [Y5..3]
+$define s0 'b'000
+$define s1 'b'001
+$define s2 'b'010
+$define s3 'b'011
+$define s4 'b'100
+$define s5 'b'101
+$define s6 'b'110
+$define s7 'b'111
+
+/* define mode states */
+FIELD mode = [clr, en, dir]
+up = mode:'b'011;
+down = mode:'b'010;
+clear = mode:'[4..7]
+
+/* set input states */
+count.sp = preset;
+count.ar = reset;
+count.oe = oe;
+
+/* state machine */
+SEQUENCE count {
+    PRESENT s0
+        if up next s1;
+        if down next s7;
+        if clear next s0;
+        default next s0;
+    PRESENT s1
+        if up next s2;
+        if down next s0;
+        if clear next s0;
+        default next s1;
+    PRESENT s2
+        if up next s3;
+        if down next s1;
+        if clear next s0;
+        default next s2;
+    PRESENT s3
+        if up next s4;
+        if down next s2;
+        if clear next s0;
+        default next s3;
+    PRESENT s4
+        if up next s5;
+        if down next s3;
+        if clear next s0;
+        default next s4;
+    PRESENT s5
+        if up next s6;
+        if down next s4;
+        if clear next s0;
+        default next s5;
+    PRESENT s6
+        if up next s7;
+        if down next s5;
+        if clear next s0;
+        default next s6;
+    PRESENT s7
+        if up next s0;
+        if down next s6;
+        if clear next s0;
+        default next s7;
+}
